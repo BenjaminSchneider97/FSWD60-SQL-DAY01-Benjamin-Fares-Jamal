@@ -1,0 +1,10 @@
+CREATE TABLE Order1 (
+    				fk_customerID int,
+    				fk_bookID int,
+    				orderID int,
+    				payment int,
+    				PRIMARY KEY (orderID),
+    			
+    				FOREIGN KEY(fk_customerID) REFERENCES customer(customerID)
+    				
+    				);
