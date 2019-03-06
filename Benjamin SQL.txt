@@ -1,0 +1,15 @@
+SELECT customer.customerName, wish.dateOfWish, book.title, author.authorName, store.location, purchase.purchaseDate
+FROM book 
+RIGHT JOIN purchase ON  book.book_id = purchase.fk_book_id
+RIGHT JOIN store ON book.fk_store_id = store.store_id
+RIGHT JOIN wish ON book.book_id = wish.fk_book_id
+RIGHT JOIN customer ON wish.fk_customer_id = customer.customer_id
+RIGHT JOIN author ON book.fk_author_id = author.author_id
+UNION
+SELECT customer.customerName, wish.dateOfWish, book.title, author.authorName, store.location, purchase.purchaseDate
+FROM book 
+LEFT JOIN purchase ON  book.book_id = purchase.fk_book_id
+LEFT JOIN store ON book.fk_store_id = store.store_id
+LEFT JOIN wish ON book.book_id = wish.fk_book_id
+LEFT JOIN customer ON wish.fk_customer_id = customer.customer_id
+LEFT JOIN author ON book.fk_author_id = author.author_id;
