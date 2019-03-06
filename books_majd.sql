@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 05, 2019 at 02:40 PM
+-- Generation Time: Mar 06, 2019 at 02:21 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.2
 
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `books`
+-- Database: `books_majd`
 --
 
 -- --------------------------------------------------------
@@ -34,6 +34,15 @@ CREATE TABLE `author` (
   `authorBDay` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `author`
+--
+
+INSERT INTO `author` (`authorID`, `authorName`, `authorBDay`) VALUES
+(1, 'Winston Graham', '1908-06-03'),
+(2, 'Agatha Christe', '1890-09-15'),
+(3, 'Carl Marx', '1818-05-05');
+
 -- --------------------------------------------------------
 
 --
@@ -42,10 +51,24 @@ CREATE TABLE `author` (
 
 CREATE TABLE `book` (
   `bookID` int(11) NOT NULL,
+  `fk_typeID` int(11) DEFAULT NULL,
   `bookName` varchar(35) DEFAULT NULL,
   `fk_authorID` int(11) DEFAULT NULL,
   `bookDate` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `book`
+--
+
+INSERT INTO `book` (`bookID`, `fk_typeID`, `bookName`, `fk_authorID`, `bookDate`) VALUES
+(0, 11, 'Poldark The Black Moon', 1, NULL),
+(1, 1, 'Marx on Economics', 3, '1963-06-01'),
+(2, 2, 'The Communist Manifesto', 3, '1988-07-01'),
+(3, 3, 'Murder on the Orient Express', 2, '1934-01-01'),
+(4, 11, 'Ross Poldark ', 1, '2008-01-01'),
+(6, 11, 'Bella Poldark', NULL, NULL),
+(21, NULL, 'Poldark Warleggen', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -57,6 +80,8 @@ CREATE TABLE `bookshop` (
   `bookShopID` int(11) NOT NULL,
   `fk_orderID` int(11) DEFAULT NULL,
   `fk_customerID` int(11) DEFAULT NULL,
+  `fk_bookID` int(11) NOT NULL,
+  `fk_onlineShopID` int(11) NOT NULL,
   `phoneNumber` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -152,9 +177,19 @@ CREATE TABLE `order1` (
 CREATE TABLE `typeofbook` (
   `typeID` int(11) NOT NULL,
   `fk_bookID` int(11) DEFAULT NULL,
-  `fk_authorID` int(11) DEFAULT NULL,
+  `authorID` int(11) DEFAULT NULL,
   `genre` varchar(32) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `typeofbook`
+--
+
+INSERT INTO `typeofbook` (`typeID`, `fk_bookID`, `authorID`, `genre`) VALUES
+(1, 1, 3, 'Economist'),
+(2, 2, 3, 'political '),
+(3, 1, 2, 'Murder Mystery'),
+(11, 1, 1, 'historical');
 
 --
 -- Indexes for dumped tables
@@ -171,7 +206,8 @@ ALTER TABLE `author`
 --
 ALTER TABLE `book`
   ADD PRIMARY KEY (`bookID`),
-  ADD KEY `authorID` (`fk_authorID`);
+  ADD KEY `fk_authorID` (`fk_authorID`),
+  ADD KEY `fk_typeID` (`fk_typeID`);
 
 --
 -- Indexes for table `bookshop`
@@ -179,7 +215,9 @@ ALTER TABLE `book`
 ALTER TABLE `bookshop`
   ADD PRIMARY KEY (`bookShopID`),
   ADD KEY `fk_orderID` (`fk_orderID`),
-  ADD KEY `fk_customerID` (`fk_customerID`);
+  ADD KEY `fk_customerID` (`fk_customerID`),
+  ADD KEY `fk_bookID` (`fk_bookID`),
+  ADD KEY `fk_onlineShopID` (`fk_onlineShopID`);
 
 --
 -- Indexes for table `creditcard`
@@ -212,9 +250,7 @@ ALTER TABLE `order1`
 -- Indexes for table `typeofbook`
 --
 ALTER TABLE `typeofbook`
-  ADD PRIMARY KEY (`typeID`),
-  ADD KEY `fk_bookID` (`fk_bookID`),
-  ADD KEY `fk_authorID` (`fk_authorID`);
+  ADD PRIMARY KEY (`typeID`);
 
 --
 -- Constraints for dumped tables
@@ -224,14 +260,17 @@ ALTER TABLE `typeofbook`
 -- Constraints for table `book`
 --
 ALTER TABLE `book`
-  ADD CONSTRAINT `book_ibfk_1` FOREIGN KEY (`fk_authorID`) REFERENCES `author` (`authorID`);
+  ADD CONSTRAINT `book_ibfk_1` FOREIGN KEY (`fk_authorID`) REFERENCES `author` (`authorID`),
+  ADD CONSTRAINT `book_ibfk_2` FOREIGN KEY (`fk_typeID`) REFERENCES `typeofbook` (`typeID`);
 
 --
 -- Constraints for table `bookshop`
 --
 ALTER TABLE `bookshop`
   ADD CONSTRAINT `bookshop_ibfk_1` FOREIGN KEY (`fk_orderID`) REFERENCES `order1` (`orderID`),
-  ADD CONSTRAINT `bookshop_ibfk_2` FOREIGN KEY (`fk_customerID`) REFERENCES `customer` (`customerID`);
+  ADD CONSTRAINT `bookshop_ibfk_2` FOREIGN KEY (`fk_customerID`) REFERENCES `customer` (`customerID`),
+  ADD CONSTRAINT `bookshop_ibfk_3` FOREIGN KEY (`fk_bookID`) REFERENCES `book` (`bookID`),
+  ADD CONSTRAINT `bookshop_ibfk_4` FOREIGN KEY (`fk_onlineShopID`) REFERENCES `onlineshop` (`onlineShopID`);
 
 --
 -- Constraints for table `customer`
@@ -245,13 +284,6 @@ ALTER TABLE `customer`
 --
 ALTER TABLE `order1`
   ADD CONSTRAINT `order1_ibfk_1` FOREIGN KEY (`fk_customerID`) REFERENCES `customer` (`customerID`);
-
---
--- Constraints for table `typeofbook`
---
-ALTER TABLE `typeofbook`
-  ADD CONSTRAINT `typeofbook_ibfk_1` FOREIGN KEY (`fk_bookID`) REFERENCES `book` (`bookID`),
-  ADD CONSTRAINT `typeofbook_ibfk_2` FOREIGN KEY (`fk_authorID`) REFERENCES `author` (`authorID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

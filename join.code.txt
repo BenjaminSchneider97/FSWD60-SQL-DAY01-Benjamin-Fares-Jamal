@@ -1,0 +1,22 @@
+1-SELECT bookName , authorName
+FROM `book`
+INNER JOIN `author` on fk_authorID = authorID;
+
+
+
+
+2- SELECT bookName , genre
+FROM `book`
+INNER JOIN `typeofbook` on fk_typeID = typeID;
+
+3- union for three table or more :
+
+SELECT book.bookName , typeofbook.genre , author.authorID
+FROM `book`
+LEFT JOIN `author` on fk_authorID = authorID
+LEFT JOIN `typeofbook` on fk_typeID = typeID
+UNION
+SELECT book.bookName , typeofbook.genre , author.authorID
+FROM `book`
+RIGHT JOIN `author` on fk_authorID = authorID
+RIGHT JOIN `typeofbook` on fk_typeID = typeID;
